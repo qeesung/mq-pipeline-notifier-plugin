@@ -36,7 +36,7 @@ node{
 
 Here is a simple rabbit client write in nodejs
 
-```nodejs
+```node
 const amqp = require('amqplib/callback_api');
 amqp.connect('amqp://username:password@localhost:32771', function(err, conn) {
   if(err) {
