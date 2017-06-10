@@ -11,3 +11,12 @@ dist: trusty
 cache:
   directories:
     - $HOME/.m2
+
+deploy:
+  provider: releases
+  api_key: ${GITHUB_API_KEY}
+  file: "target/mq-pipeline-notifier.hpi"
+  skip_cleanup: true
+  on:
+    all_branches: true
+    tags: true
