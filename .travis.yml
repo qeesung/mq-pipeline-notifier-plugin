@@ -1,6 +1,8 @@
 language: java
 
-script: "mvn install"
+script:
+  - cp ./config/setting.xml $HOME/.m2/setting.xml
+  - mvn install
 
 jdk:
   - oraclejdk8
