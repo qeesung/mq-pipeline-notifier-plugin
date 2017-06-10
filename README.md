@@ -7,3 +7,7 @@ This plugin is not published to the jenkins official website, you need to instal
 
     1. download this plugin from here
     2. upload this plugin to the jenkins
+    
+## Usage
+
+Config the rabbitmq address, username, password, exchange, and routing in global jenkins configurations page
