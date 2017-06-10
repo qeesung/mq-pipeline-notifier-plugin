@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.mqpipelinenotifier;
 
 
 import com.google.common.util.concurrent.ListenableFuture;
+import com.rabbitmq.client.AMQP;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -29,7 +30,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -45,6 +48,8 @@ import java.util.logging.Level;
 public class StageEventRunListenerImpl extends RunListener<Run<?, ?>> {
     private static final Logger LOGGER = LoggerFactory.getLogger(StageEventRunListenerImpl.class);
     private ExecutorService executor;
+    private static MQPipelineNotifierConfig config;
+
 
     public StageEventRunListenerImpl() {
         this.executor = new ThreadPoolExecutor(0, 5, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue());
@@ -218,9 +223,22 @@ public class StageEventRunListenerImpl extends RunListener<Run<?, ?>> {
         }
 
         private void publishEvent(Message message) {
-            System.out.println("================");
-            System.out.println(message);
-            System.out.println("++++++++++++++++");
+            if (config == null) {
+                config = MQPipelineNotifierConfig.getInstance();
+            }
+            if (config != null) {
+                AMQP.BasicProperties.Builder bob = new AMQP.BasicProperties.Builder();
+                int dm = 1;
+                if (config.getPersistentDelivery()) {
+                    dm = 2;
+                }
+                bob.appId(config.getAppId());
+                bob.deliveryMode(dm);
+                bob.contentType(Util.CONTENT_TYPE);
+                bob.timestamp(Calendar.getInstance().getTime());
+                MQPipelineConnection.getInstance().addMessageToQueue(config.getExchangeName(), config.getRoutingKey(),
+                        bob.build(), message.toString().getBytes(StandardCharsets.UTF_8));
+            }
         }
     }
 }
