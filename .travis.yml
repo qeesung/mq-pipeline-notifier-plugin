@@ -5,3 +5,8 @@ script: "mvn install"
 jdk:
   - oraclejdk8
   - openjdk8
+
+
+cache:
+  directories:
+    - $HOME/.m2
